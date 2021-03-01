@@ -250,9 +250,9 @@ MockupFactoryId = 0
 MintNumFloors = {CashbotMintIntA: 20,
  CashbotMintIntB: 20,
  CashbotMintIntC: 20}
-CashbotMintCogLevel = 10
-CashbotMintSkelecogLevel = 11
-CashbotMintBossLevel = 12
+CashbotMintCogLevel = 8
+CashbotMintSkelecogLevel = 8
+CashbotMintBossLevel = 13
 MintNumBattles = {CashbotMintIntA: 4,
  CashbotMintIntB: 6,
  CashbotMintIntC: 8}
@@ -264,7 +264,7 @@ MintNumRooms = {CashbotMintIntA: 2 * (6,) + 5 * (7,) + 5 * (8,) + 5 * (9,) + 3 *
  CashbotMintIntC: 4 * (10,) + 10 * (11,) + 6 * (12,)}
 BossbotCountryClubCogLevel = 11
 BossbotCountryClubSkelecogLevel = 12
-BossbotCountryClubBossLevel = 12
+BossbotCountryClubBossLevel = 13
 CountryClubNumRooms = {BossbotCountryClubIntA: (4,),
  BossbotCountryClubIntB: 3 * (8,) + 6 * (9,) + 6 * (10,) + 5 * (11,),
  BossbotCountryClubIntC: 4 * (10,) + 10 * (11,) + 6 * (12,)}
@@ -276,7 +276,7 @@ CountryClubCogBuckRewards = {BossbotCountryClubIntA: 8,
  BossbotCountryClubIntC: 20}
 LawbotStageCogLevel = 10
 LawbotStageSkelecogLevel = 11
-LawbotStageBossLevel = 12
+LawbotStageBossLevel = 13
 StageNumBattles = {LawbotStageIntA: 0,
  LawbotStageIntB: 0,
  LawbotStageIntC: 0,
@@ -617,31 +617,31 @@ BossCogAttackTimes = {BossCogElectricFence: 0,
  BossCogFrontAttack: 2.65,
  BossCogRecoverDizzyAttack: 5.1,
  BossCogDirectedAttack: 4.84,
- BossCogNoAttack: 6,
- BossCogSlowDirectedAttack: 7.84,
- BossCogMoveAttack: 3,
- BossCogGolfAttack: 6,
- BossCogGolfAreaAttack: 7,
- BossCogGearDirectedAttack: 4.84,
- BossCogOvertimeAttack: 5}
+ BossCogNoAttack: 19,
+ BossCogSlowDirectedAttack: 70.84,
+ BossCogMoveAttack: 30,
+ BossCogGolfAttack: 60,
+ BossCogGolfAreaAttack: 70,
+ BossCogGearDirectedAttack: 40.84,
+ BossCogOvertimeAttack: 50}
 BossCogDamageLevels = {BossCogElectricFence: 1,
- BossCogSwatLeft: 5,
- BossCogSwatRight: 5,
- BossCogAreaAttack: 10,
- BossCogFrontAttack: 3,
- BossCogRecoverDizzyAttack: 3,
- BossCogDirectedAttack: 3,
- BossCogStrafeAttack: 2,
- BossCogGoonZap: 5,
- BossCogSlowDirectedAttack: 10,
- BossCogGavelStomp: 20,
- BossCogGavelHandle: 2,
- BossCogLawyerAttack: 5,
- BossCogMoveAttack: 20,
- BossCogGolfAttack: 15,
- BossCogGolfAreaAttack: 15,
- BossCogGearDirectedAttack: 15,
- BossCogOvertimeAttack: 10}
+ BossCogSwatLeft: 50,
+ BossCogSwatRight: 50,
+ BossCogAreaAttack: 18,
+ BossCogFrontAttack: 30,
+ BossCogRecoverDizzyAttack: 30,
+ BossCogDirectedAttack: 30,
+ BossCogStrafeAttack: 20,
+ BossCogGoonZap: 50,
+ BossCogSlowDirectedAttack: 100,
+ BossCogGavelStomp: 30,
+ BossCogGavelHandle: 20,
+ BossCogLawyerAttack: 50,
+ BossCogMoveAttack: 30,
+ BossCogGolfAttack: 30,
+ BossCogGolfAreaAttack: 30,
+ BossCogGearDirectedAttack: 30,
+ BossCogOvertimeAttack: 30}
 BossCogBattleAPosHpr = (0,
  -25,
  0,
@@ -681,23 +681,41 @@ SellbotBossP3PosA = (-50, 40, 18)
 SellbotBossTopRampPosB = (80, -35, 18)
 SellbotBossTopRampTurnPosB = (80, 10, 18)
 SellbotBossP3PosB = (50, 60, 18)
-CashbotBossMaxDamage = 500
+CashbotBossMaxDamage = 50000
 CashbotBossOffstagePosHpr = (120,
- -195,
+ - 195,
  0,
  0,
  0,
  0)
 CashbotBossBattleOnePosHpr = (120,
- -230,
+ - 230,
  0,
  90,
  0,
  0)
+CashbotBossBattleTwoPosHpr = (120,
+ - 315,
+ 0,
+ 180,
+ 0,
+ 0)
 CashbotRTBattleOneStartPosHpr = (94,
- -220,
+ - 220,
  0,
  110,
+ 0,
+ 0)
+CashbotRTBattleTwoStartPosHpr = (120,
+ - 260,
+ 0.025,
+ 0,
+ 0,
+ 0)
+CashbotRTBattleTwoEndPosHpr = (120,
+ - 290,
+ 0.025,
+ 0,
  0,
  0)
 CashbotBossBattleThreePosHpr = (120,
@@ -1671,8 +1689,9 @@ AV_TOUCH_CHECK_DIST_Z = 5.0
 AV_TOUCH_CHECK_TIMELIMIT_CL = 0.002
 AV_TOUCH_COUNT_LIMIT = 5
 AV_TOUCH_COUNT_TIME = 300
-SuitLevels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-GravityValue = 32.174
+SuitLevels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 30, 40, 50]
+FactoryForemenLevels = [18]
+GravityValue = 32.174 
 hood2Id = [
     ('TTC', (ToontownCentral,)),
     ('DD', (DonaldsDock,)),
@@ -1725,3 +1744,4 @@ hood2Coords = {
  'BACK': [(-73.911, 87.426, 11.803, 10.170, 0, 0)],
  'MIDDLE': [(-98.805, 39.180, 11.364, -253.350, 0, 0)],
  'FRONT': [(-105.626, -33.441, 9.777, -211.885, 0, 0)]}
+

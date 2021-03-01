@@ -6,6 +6,7 @@ import LevelBattleManagerAI
 import types
 import random
 
+
 class LevelSuitPlannerAI(DirectObject.DirectObject):
     notify = DirectNotifyGlobal.directNotify.newCategory('LevelSuitPlannerAI')
 

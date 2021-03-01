@@ -301,7 +301,10 @@ class DistributedSuitPlannerAI(DistributedObjectAI.DistributedObjectAI, SuitPlan
 
         return pointList
 
-    def createNewSuit(self, blockNumbers, streetPoints, toonBlockTakeover=None, cogdoTakeover=None, minPathLen=None, maxPathLen=None, buildingHeight=None, suitLevel=None, suitType=None, suitTrack=None, suitName=None, skelecog=None, revives=None):
+    def createNewSuit(self, blockNumbers, streetPoints, toonBlockTakeover=None,
+            cogdoTakeover=None, minPathLen=None, maxPathLen=None,
+            buildingHeight=None, suitLevel=None, suitType=None, suitTrack=None,
+            suitName=None, skelecog=None, revives=None, waiter=None, specialSuit = 0):
         startPoint = None
         blockNumber = None
         if self.notify.getDebug():
@@ -1145,20 +1148,28 @@ class DistributedSuitPlannerAI(DistributedObjectAI.DistributedObjectAI, SuitPlan
         self.sendUpdateToAvatarId(self.air.getAvatarIdFromSender(), 'buildingListResponse', [buildingList])
 
     def pickLevelTypeAndTrack(self, level=None, type=None, track=None):
-        if level == None:
+        if level is None:
             level = random.choice(self.SuitHoodInfo[self.hoodInfoIdx][self.SUIT_HOOD_INFO_LVL])
-        if type == None:
-            typeChoices = xrange(max(level - 4, 1), min(level, self.MAX_SUIT_TYPES) + 1)
+        if type is None:
+            typeChoices = range(max(level - 4, 1), min(level, self.MAX_SUIT_TYPES) + 1)
             type = random.choice(typeChoices)
-
-        if level not in ToontownGlobals.SuitLevels:
+        else:
             level = min(max(level, type), type + 4)
-
-        if track == None:
+        if track is None:
             track = SuitDNA.suitDepts[SuitBattleGlobals.pickFromFreqList(self.SuitHoodInfo[self.hoodInfoIdx][self.SUIT_HOOD_INFO_TRACK])]
+        self.notify.debug('pickLevelTypeAndTrack: %s %s %s' % (level, type, track))
+        return (level, type, track)
+            
+            
+        if level > 12:
+            pass 
+        else:
+            level = min(max(level, type), type + 4)
+        if track == None:
+            track = SuitDNA.suitDepts[
+                SuitBattleGlobals.pickFromFreqList(self.SuitHoodInfo[self.hoodInfoIdx][self.SUIT_HOOD_INFO_TRACK])]
         self.notify.debug('pickLevelTypeAndTrack: %d %d %s' % (level, type, track))
-        return (
-         level, type, track)
+        return (level, type, track)
 
     @classmethod
     def dump(cls):

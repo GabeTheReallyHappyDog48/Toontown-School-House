@@ -2720,7 +2720,11 @@ SCMenuCustomCogIndices = {'bf': (20005, 20014),
  'ls': (20309, 20319),
  'rb': (20320, 20329),
  'sc': (20330, 20331),
- 'sd': (20341, 20350)}
+ 'sd': (20341, 20350),
+ 'ooo': (20115, 20124),
+ 'ye': (20115, 20124),
+ 'bm': (20115, 20124),
+ 'see': (20115, 20124)}
 PSCMenuExpressions = 'EXPRESSIONS'
 PSCMenuGreetings = 'GREETINGS'
 PSCMenuGoodbyes = 'GOODBYES'

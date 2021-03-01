@@ -74,6 +74,8 @@ tbc = (('cigar-smoke', 'cigar-smoke', 8),
  ('glower', 'glower', 5),
  ('song-and-dance', 'song-and-dance', 8),
  ('golf-club-swing', 'golf-club-swing', 5))
+ooo = (('glower', 'glower', 5), 
+ ('throw-paper', 'throw-paper', 5))
 cc = (('speak', 'speak', 5),
  ('glower', 'glower', 5),
  ('phone', 'phone', 3.5),
@@ -104,6 +106,8 @@ mh = (('magic1', 'magic1', 5),
  ('smile', 'smile', 5),
  ('golf-club-swing', 'golf-club-swing', 5),
  ('song-and-dance', 'song-and-dance', 5))
+see = (('magic2', 'magic2', 5), 
+ ('phone', 'phone', 5))
 sc = (('throw-paper', 'throw-paper', 3.5), ('watercooler', 'watercooler', 5), ('pickpocket', 'pickpocket', 5))
 pp = (('throw-paper', 'throw-paper', 5), ('glower', 'glower', 5), ('finger-wag', 'fingerwag', 5))
 tw = (('throw-paper', 'throw-paper', 3.5),
@@ -115,6 +119,7 @@ nc = (('phone', 'phone', 5), ('throw-object', 'throw-object', 5))
 mb = (('magic1', 'magic1', 5), ('throw-paper', 'throw-paper', 3.5))
 ls = (('throw-paper', 'throw-paper', 5), ('throw-object', 'throw-object', 5), ('hold-pencil', 'hold-pencil', 5))
 rb = (('glower', 'glower', 5), ('magic1', 'magic1', 5), ('golf-club-swing', 'golf-club-swing', 5))
+bm = (('magic1', 'magic1', 5), ('hold-pencil', 'hold-pencil', 5))
 bf = (('pickpocket', 'pickpocket', 5),
  ('rubber-stamp', 'rubber-stamp', 5),
  ('shredder', 'shredder', 3.5),
@@ -150,6 +155,7 @@ bw = (('finger-wag', 'fingerwag', 5),
  ('magic1', 'magic1', 5),
  ('throw-object', 'throw-object', 5),
  ('throw-paper', 'throw-paper', 5))
+ye = (('stomp', 'stomp', 5), ('effort', 'effort', 5))
 if not base.config.GetBool('want-new-cogs', 0):
     ModelDict = {'a': ('/models/char/suitA-', 4),
      'b': ('/models/char/suitB-', 4),
@@ -351,6 +357,8 @@ class Suit(Avatar.Avatar):
         self.isDisguised = 0
         self.isWaiter = 0
         self.isRental = 0
+        self.isFore = False
+        self.isSuper = False
         return
 
     def delete(self):
@@ -399,6 +407,7 @@ class Suit(Avatar.Avatar):
             self.generateSuit()
             self.initializeDropShadow()
             self.initializeNametag3d()
+            self.setBlend(frameBlend=True)
 
     def generateSuit(self):
         dna = self.style
@@ -457,6 +466,15 @@ class Suit(Avatar.Avatar):
             self.generateBody()
             self.generateHead('bigcheese')
             self.setHeight(9.34)
+        elif dna.name == 'ooo':
+            self.scale = 7.0 / aSize
+            self.handColor = VBase4(0.8, 0.32, 1.0, 1.0)
+            self.generateBody()
+            self.headTexture = 'CustomCog.jpg'
+            self.generateHead('twoface')
+            self.setHeight(8.95)
+            self.makeSkeleton()
+            self.president()
         elif dna.name == 'bf':
             self.scale = 4.0 / cSize
             self.handColor = SuitDNA.legalPolyColor
@@ -509,6 +527,16 @@ class Suit(Avatar.Avatar):
             self.generateBody()
             self.generateHead('bigwig')
             self.setHeight(8.69)
+        elif dna.name == 'ye':
+            self.scale = 7.0 / bSize
+            self.handColor = VBase4(0.25, 0.35, 1.0, 1.0)
+            self.generateBody()
+            self.headTexture = 'CustomMover.jpg'
+            self.generateHead('movershaker')
+            self.setHeight(8.95)
+            self.setHeight(8.69)
+            self.makeSkeleton()
+            self.attorney()
         elif dna.name == 'sc':
             self.scale = 3.6 / cSize
             self.handColor = SuitDNA.moneyPolyColor
@@ -558,6 +586,15 @@ class Suit(Avatar.Avatar):
             self.headTexture = 'robber-baron.jpg'
             self.generateHead('yesman')
             self.setHeight(8.95)
+        elif dna.name == 'bm':
+            self.scale = 7.0 / bSize
+            self.handColor = SuitDNA.moneyPolyColor
+            self.generateBody()
+            self.headTexture = 'COgs.jpg'
+            self.generateHead('ambulancechaser')
+            self.setHeight(8.95)
+            self.makeSkeleton()
+            self.supervisor()
         elif dna.name == 'cc':
             self.scale = 3.5 / cSize
             self.handColor = VBase4(0.55, 0.65, 1.0, 1.0)
@@ -609,10 +646,20 @@ class Suit(Avatar.Avatar):
             self.generateBody()
             self.generateHead('yesman')
             self.setHeight(8.95)
+        elif dna.name == 'see':
+            self.scale = 7.0 / aSize
+            self.handColor = VBase4(0.8, 0.32, 1.0, 1.0)
+            self.generateBody()
+            self.headTexture = 'Custom2.jpg'
+            self.generateHead('yesman')
+            self.setHeight(8.95)
+            self.makeSkeleton()
+            self.foremen()
         self.setName(SuitBattleGlobals.SuitAttributes[dna.name]['name'])
         self.getGeomNode().setScale(self.scale)
         self.generateHealthBar()
         self.generateCorporateMedallion()
+        self.setBlend(frameBlend = config.GetBool('interpolate-animations', True))
         return
 
     def generateBody(self):
@@ -627,6 +674,49 @@ class Suit(Avatar.Avatar):
             self.loadModel('phase_3.5' + filePrefix + 'mod')
         self.loadAnims(animDict)
         self.setSuitClothes()
+        
+        
+    def generateSkelSuit(self):
+        dna = self.style
+        self.headParts = []
+        self.headColor = None
+        self.headTexture = None
+        self.loseActor = None
+        self.isSkeleton = 1
+
+        if dna.name in SuitGlobals.suitProperties:
+            self.scale = SuitGlobals.suitProperties[dna.name][SuitGlobals.SCALE_INDEX]
+               
+            print 'b4 skelbody'
+            self.generateSkelBody()
+            print 'after skelbody'
+
+            self.setHeight(SuitGlobals.suitProperties[dna.name][SuitGlobals.HEIGHT_INDEX])
+
+        self.setName(SuitBattleGlobals.SuitAttributes[dna.name]['name'])
+        self.getGeomNode().setScale(self.scale)
+        print 'b4 geomnode'
+        self.generateHealthBar()
+        print 'genHealth'
+        self.generateCorporateMedallion()
+        print 'genCorp'
+        self.generateCorporateTie()
+        print 'genTie'
+        self.setBlend(frameBlend=True)
+        
+    def generateSkelBody(self):
+        global Preloaded
+        animDict = self.generateAnimDict()
+        filePrefix, bodyPhase = ModelDict[self.style.body]
+        filepath = 'phase_5/models/char/cog' + string.upper(self.style.body) + '_robot-zero'
+        self.loadModel(Preloaded[filepath], copy = True)
+        self.loadAnims(animDict)
+        parts = self.findAllMatches('**/pPlane*')
+        for partNum in xrange(0, parts.getNumPaths()):
+            bb = parts.getPath(partNum)
+            bb.setTwoSided(1)
+        self.setBlend(frameBlend=True)
+    
 
     def generateAnimDict(self):
         animDict = {}
@@ -932,6 +1022,14 @@ class Suit(Avatar.Avatar):
                 loseAnim = 'phase_' + str(phase) + filePrefix + 'lose'
                 self.loseActor = Actor.Actor(loseModel, {'lose': loseAnim})
                 self.generateCorporateTie(self.loseActor)
+                if self.style.name == 'see':
+                    self.loseActor.setColor(VBase4(0.95, 0.75, 0.95, 1.0))
+                elif self.style.name == 'bm':
+                    self.loseActor.setColor(VBase4(0.95, 0.75, 0.95, 1.0))
+                elif self.style.name == 'ye':
+                    self.loseActor.setColor(VBase4(0.95, 0.75, 0.95, 1.0))
+                elif self.style.name == 'ooo':
+                    self.loseActor.setColor(VBase4(0.95, 0.75, 0.95, 1.0))
         self.loseActor.setScale(self.scale)
         self.loseActor.setPos(self.getPos())
         self.loseActor.setHpr(self.getHpr())
@@ -940,6 +1038,7 @@ class Suit(Avatar.Avatar):
         dropShadow.setScale(0.45)
         dropShadow.setColor(0.0, 0.0, 0.0, 0.5)
         dropShadow.reparentTo(shadowJoint)
+        self.setBlend(frameBlend = config.GetBool('interpolate-animations', True))
         return self.loseActor
 
     def cleanupLoseActor(self):
@@ -950,19 +1049,27 @@ class Suit(Avatar.Avatar):
         self.loseActor = None
         return
 
-    def makeSkeleton(self):
+    def makeSkeleton(self, isToon = False):
         model = 'phase_5/models/char/cog' + string.upper(self.style.body) + '_robot-zero'
         anims = self.generateAnimDict()
         anim = self.getCurrentAnim()
         dropShadow = self.dropShadow
-        if not dropShadow.isEmpty():
-            dropShadow.reparentTo(hidden)
+        if dropShadow is None:
+            pass
+        else:
+            if not dropShadow.isEmpty():
+                dropShadow.reparentTo(hidden)
         self.removePart('modelRoot')
         self.loadModel(model)
         self.loadAnims(anims)
         self.getGeomNode().setScale(self.scale * 1.0173)
-        self.generateHealthBar()
-        self.generateCorporateMedallion()
+        if self.style.name == 'sf':
+            self.getGeomNode().setColor(VBase4(1, .29, .6, 1))
+        elif self.style.name == 'mr':
+            self.getGeomNode().setColor(VBase4(.25, .25, .25, 1))
+        if isToon == False:
+            self.generateHealthBar()
+            self.generateCorporateMedallion()
         self.generateCorporateTie()
         self.setHeight(self.height)
         parts = self.findAllMatches('**/pPlane*')
@@ -970,21 +1077,32 @@ class Suit(Avatar.Avatar):
             bb = parts.getPath(partNum)
             bb.setTwoSided(1)
 
-        self.setName(TTLocalizer.Skeleton)
-        nameInfo = TTLocalizer.SuitBaseNameWithLevel % {'name': self._name,
-         'dept': self.getStyleDept(),
-         'level': self.getActualLevel()}
-        self.setDisplayName(nameInfo)
+        if isToon == False and self.style.name != 'sf':
+            self.setName(TTLocalizer.Skeleton)
+            nameInfo = TTLocalizer.SuitBaseNameWithLevel % {'name': self.name,
+            'dept': self.getStyleDept(),
+            'level': self.getActualLevel()}
+            self.setDisplayName(nameInfo)
+        elif self.style.name == 'sf':
+            self.setName(TTLocalizer.SuitSwagForeman)
+            nameInfo = TTLocalizer.SuitBaseNameWithLevel % {'name': self.name,
+            'dept': self.getStyleDept(),
+            'level': self.getActualLevel()}
+            self.setDisplayName(nameInfo)
         self.leftHand = self.find('**/joint_Lhold')
         self.rightHand = self.find('**/joint_Rhold')
         self.shadowJoint = self.find('**/joint_shadow')
         self.nametagNull = self.find('**/joint_nameTag')
-        if not dropShadow.isEmpty():
-            dropShadow.setScale(0.75)
-            if not self.shadowJoint.isEmpty():
-                dropShadow.reparentTo(self.shadowJoint)
+        if dropShadow is None:
+            pass
+        else:
+            if not dropShadow.isEmpty():
+                dropShadow.setScale(0.75)
+                if not self.shadowJoint.isEmpty():
+                    dropShadow.reparentTo(self.shadowJoint)
         self.loop(anim)
         self.isSkeleton = 1
+        self.setBlend(frameBlend=True)
 
     def getHeadParts(self):
         return self.headParts
@@ -1007,3 +1125,38 @@ class Suit(Avatar.Avatar):
             return SkelSuitDialogArray
         else:
             return SuitDialogArray
+  
+    def getStyleDept(self):
+        if hasattr(self, 'dna') and self.dna:
+            return SuitDNA.getDeptFullname(self.dna.dept)
+            
+    def getActualLevel(self):
+        if hasattr(self, 'dna'):
+            if hasattr(self, 'level'):
+                lv = SuitBattleGlobals.getActualFromRelativeLevel(self.getStyleName(), self.level)
+            else:
+                lv = SuitBattleGlobals.getActualFromRelativeLevel(self.getStyleName(), SuitDNA.suitDepts.index(SuitDNA.getSuitDept(self.dna.name)))
+            try:
+                goodRet = ToontownGlobals.SuitLevels[lv]
+            except IndexError:
+                goodRet = 50
+            return goodRet
+        else:
+            self.notify.warning('called getActualLevel with no DNA, returning 1 for level')
+            return 1
+
+    def foremen(self):
+        self.getGeomNode().setColor(0.95, 0.75, 0.95, 1.0)
+        self.isFore = True
+    
+    def supervisor(self):
+        self.getGeomNode().setColor(0.65, 0.95, 0.85, 1.0)
+        self.isSuper = True 
+       
+    def attorney(self):
+        self.getGeomNode().setColor(0.75, 0.75, 0.95, 1.0)
+        self.isFore = True
+        
+    def president(self):
+        self.getGeomNode().setColor(0.95, 0.75, 0.75, 1.0)
+        self.isFore = True

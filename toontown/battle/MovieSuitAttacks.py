@@ -1939,6 +1939,8 @@ def doEvilEye(attack):
         posPoints = [Point3(-0.4, 3.65, 5.01), VBase3(-155.0, -20.0, 0.0)]
     elif suitName == 'le':
         posPoints = [Point3(-0.64, 4.45, 5.91), VBase3(-155.0, -20.0, 0.0)]
+    elif suitName == 'ye':
+        posPoints = [Point3(-0.84, 4.48, 6), VBase3(-150.0, -20.0, 0.0)]
     else:
         posPoints = [Point3(-0.4, 3.65, 5.01), VBase3(-155.0, -20.0, 0.0)]
     appearDelay = 0.8
@@ -1948,12 +1950,12 @@ def doEvilEye(attack):
     eyeHoldDuration = 1.1
     moveDuration = 1.1
     suitSplicedAnims = []
-    suitSplicedAnims.append(['glower',
+    suitSplicedAnims.append(['glower' and 'effort',
      0.01,
      0.01,
      suitHoldStart])
-    suitSplicedAnims.extend(getSplicedLerpAnims('glower', suitHoldDuration, 1.1, startTime=suitHoldStart))
-    suitSplicedAnims.append(['glower', 0.01, suitHoldStop])
+    suitSplicedAnims.extend(getSplicedLerpAnims('glower' and 'effort', suitHoldDuration, 1.1, startTime=suitHoldStart))
+    suitSplicedAnims.append(['glower' and 'effort', 0.01, suitHoldStop])
     suitTrack = getSuitTrack(attack, splicedAnims=suitSplicedAnims)
     eyeAppearTrack = Sequence(Wait(suitHoldStart), Func(__showProp, eye, suit, posPoints[0], posPoints[1]), LerpScaleInterval(eye, suitHoldDuration, Point3(11, 11, 11)), Wait(eyeHoldDuration * 0.3), LerpHprInterval(eye, 0.02, Point3(205, 40, 0)), Wait(eyeHoldDuration * 0.7), Func(battle.movie.needRestoreRenderProp, eye), Func(eye.wrtReparentTo, battle))
     toonFace = __toonFacePoint(toon, parent=battle)

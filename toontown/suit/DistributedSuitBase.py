@@ -354,6 +354,30 @@ class DistributedSuitBase(DistributedAvatar.DistributedAvatar, Suit.Suit, SuitBa
         SuitBase.SuitBase.setSkelecog(self, flag)
         if flag:
             Suit.Suit.makeSkeleton(self)
+            if self.dna.name == 'see':
+                self.setName(TTLocalizer.SuitCustom2)
+                nameInfo = TTLocalizer.SuitBaseNameWithLevel % {'name': self._name,
+                 'dept': self.getStyleDept(),
+                 'level': self.getActualLevel()}
+                self.setDisplayName(nameInfo)
+            elif self.dna.name == 'ye':
+                self.setName(TTLocalizer.SuitCustom4)
+                nameInfo = TTLocalizer.SuitBaseNameWithLevel % {'name': self._name,
+                 'dept': self.getStyleDept(),
+                 'level': self.getActualLevel()}
+                self.setDisplayName(nameInfo)
+            elif self.dna.name == 'bm':
+                self.setName(TTLocalizer.SuitCustom3)
+                nameInfo = TTLocalizer.SuitBaseNameWithLevel % {'name': self._name,
+                 'dept': self.getStyleDept(),
+                 'level': self.getActualLevel()}
+                self.setDisplayName(nameInfo)
+            elif self.dna.name == 'ooo':
+                self.setName(TTLocalizer.SuitCustom1)
+                nameInfo = TTLocalizer.SuitBaseNameWithLevel % {'name': self._name,
+                 'dept': self.getStyleDept(),
+                 'level': self.getActualLevel()}
+                self.setDisplayName(nameInfo)
 
     def showHpText(self, number, bonus = 0, scale = 1, attackTrack = -1):
         if self.HpTextEnabled and not self.ghostMode:

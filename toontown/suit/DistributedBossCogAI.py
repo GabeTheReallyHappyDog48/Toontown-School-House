@@ -367,14 +367,11 @@ class DistributedBossCogAI(DistributedAvatarAI.DistributedAvatarAI):
         for suit in self.suitsA + self.suitsB:
             suit.requestDelete()
 
-        for suit, joinChance in self.reserveSuits:
-            suit.requestDelete()
 
         self.suitsA = []
         self.activeSuitsA = []
         self.suitsB = []
         self.activeSuitsB = []
-        self.reserveSuits = []
         self.battleNumber = 0
         if sendReset:
             self.sendBattleIds()

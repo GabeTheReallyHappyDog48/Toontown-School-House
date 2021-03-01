@@ -218,6 +218,10 @@ class DistributedCashbotBoss(DistributedBossCog.DistributedBossCog, FSM.FSM):
         planeNode.setCollideMask(ToontownGlobals.PieBitmask)
         self.geom.attachNewNode(planeNode)
         self.geom.reparentTo(render)
+        self.elevatorMusic = base.loader.loadMusic('phase_10/audio/bgm/cb_elevator.ogg')
+        self.betweenBattleMusic = base.loader.loadMusic('phase_9/audio/bgm/encntr_toon_winning.ogg')
+        self.battleTwoMusic = base.loadMusic('phase_7/audio/bgm/encntr_suit_winning_indoor.ogg')
+     
 
     def unloadEnvironment(self):
         DistributedBossCog.DistributedBossCog.unloadEnvironment(self)
@@ -361,7 +365,7 @@ class DistributedCashbotBoss(DistributedBossCog.DistributedBossCog, FSM.FSM):
                                         rToon.posInterval(1.5, VBase3(109, -294, 0)),
                                         Parallel(Func(rToon.animFSM.request, 'jump')),
                                         rToon.posInterval(1.5, VBase3(93.935, -341.065, 2))),
-                                    self.door2.posInterval(3, VBase3(0, 0, 0))),
+                                    self.door2.posInterval(3, VBase3(0, 0, 30))),
                                     Func(rToon.animFSM.request, 'neutral')),
                                     self.toonNormalEyes(self.involvedToons),
                                     self.toonNormalEyes([self.resistanceToon], True),
@@ -371,6 +375,56 @@ class DistributedCashbotBoss(DistributedBossCog.DistributedBossCog, FSM.FSM):
                                     Wait(2),
                                     Func(self.clearChat))
         return Sequence(Func(camera.reparentTo, render), track)
+     
+    def __makeRollToBattleTwoMovie(self):
+        startPos = Point3(ToontownGlobals.CashbotBossBattleOnePosHpr[0], ToontownGlobals.CashbotBossBattleOnePosHpr[1], ToontownGlobals.CashbotBossBattleOnePosHpr[2])
+        battlePos = Point3(ToontownGlobals.CashbotBossBattleTwoPosHpr[0], ToontownGlobals.CashbotBossBattleTwoPosHpr[1], ToontownGlobals.CashbotBossBattleTwoPosHpr[2])
+        battleHpr = VBase3(ToontownGlobals.CashbotBossBattleTwoPosHpr[3], ToontownGlobals.CashbotBossBattleTwoPosHpr[4], ToontownGlobals.CashbotBossBattleTwoPosHpr[5])
+        self.door2.posInterval(3, VBase3(0, 0, 30))
+        bossTrack = Sequence()
+        bossTrack.append(Func(self.getGeomNode().setH, 180))
+        bossTrack.append(Func(self.loop, 'Fb_neutral'))
+        track, hpr = self.rollBossToPoint(startPos, None, battlePos, None, 0)
+        bossTrack.append(track)
+        track, hpr = self.rollBossToPoint(battlePos, hpr, battlePos, battleHpr, 0)
+        return Sequence(bossTrack, Func(self.getGeomNode().setH, 0), name=self.uniqueName('BattleTwo'))
+        
+        
+    def makePrepareBattleTwoMovie(self, delayDeletes):
+        for toonId in self.involvedToons:
+            toon = self.cr.doId2do.get(toonId)
+            if toon:
+                delayDeletes.append(DelayDelete.DelayDelete(toon, 'CashbotBoss.makePrepareBattleTwoMovie'))
+
+        startPos = Point3(ToontownGlobals.CashbotBossBattleOnePosHpr[0], ToontownGlobals.CashbotBossBattleOnePosHpr[1], ToontownGlobals.CashbotBossBattleOnePosHpr[2])
+        battlePos = Point3(ToontownGlobals.CashbotBossBattleThreePosHpr[0], ToontownGlobals.CashbotBossBattleThreePosHpr[1], ToontownGlobals.CashbotBossBattleThreePosHpr[2])
+        startHpr = Point3(ToontownGlobals.CashbotBossBattleOnePosHpr[3], ToontownGlobals.CashbotBossBattleOnePosHpr[4], ToontownGlobals.CashbotBossBattleOnePosHpr[5])
+        battleHpr = VBase3(ToontownGlobals.CashbotBossBattleThreePosHpr[3], ToontownGlobals.CashbotBossBattleThreePosHpr[4], ToontownGlobals.CashbotBossBattleThreePosHpr[5])
+        finalHpr = VBase3(135, 0, 0)
+        bossTrack = Sequence()
+        bossTrack.append(Func(self.reparentTo, render))
+        bossTrack.append(Func(self.getGeomNode().setH, 180))
+        bossTrack.append(Func(self.pelvis.setHpr, self.pelvisForwardHpr))
+        bossTrack.append(Func(self.loop, 'Ff_neutral'))
+        track, hpr = self.rollBossToPoint(startPos, startHpr, startPos, battleHpr, 0)
+        bossTrack.append(track)
+        track, hpr = self.rollBossToPoint(startPos, None, battlePos, None, 0)
+        bossTrack.append(track)
+        track, hpr = self.rollBossToPoint(battlePos, battleHpr, battlePos, finalHpr, 0)
+        bossTrack.append(track)
+        rToon = self.resistanceToon
+        rToon.setPosHpr(93.935, -341.065, 0, -45, 0, 0)
+        track = Sequence(
+            Func(rToon.loop, 'leverNeutral'),
+            Func(base.camera.wrtReparentTo, self.geom),
+            base.camera.posHprInterval(1.5, Point3(105, -326, 5), Point3(136.3, 0, 0), blendType='easeInOut'),
+            Func(rToon.setChatAbsolute, TTL.ResistanceToonStall, CFSpeech),
+            Wait(4),
+            Func(rToon.clearChat),
+            Func(self.getGeomNode().setH, 0),
+            Wait(2))
+        return Sequence(Func(camera.reparentTo, render), track)
+	
 
     def __makeGoonMovieForBattleThree(self):
         goonPosHprs = [[Point3(111, -287, 0),
@@ -425,21 +479,11 @@ class DistributedCashbotBoss(DistributedBossCog.DistributedBossCog, FSM.FSM):
             Func(crane.accomodateToon, rToon),
             Func(goon.request, 'Stunned'),
             Func(goon.setPosHpr, 104, -316, 0, 165, 0, 0),
-            Parallel(
-                self.door2.posInterval(4.5, VBase3(0, 0, 30)),
-                self.door3.posInterval(4.5, VBase3(0, 0, 30)),
-                bossTrack),
             Func(rToon.loop, 'leverNeutral'),
-            Func(camera.reparentTo, self.geom),
-            Func(camera.setPosHpr, 105, -326, 5, 136.3, 0, 0),
-            Func(rToon.setChatAbsolute, TTL.ResistanceToonWatchThis, CFSpeech),
-            Wait(2),
-            Func(rToon.clearChat),
-            Func(camera.setPosHpr, 105, -326, 20, -45.3, 11, 0),
-            Func(self.setChatAbsolute, TTL.CashbotBossGetAwayFromThat, CFSpeech),
-            Wait(2),
-            Func(self.clearChat),
-            camera.posHprInterval(1.5, Point3(105, -326, 5), Point3(136.3, 0, 0), blendType='easeInOut'),
+            Func(base.camera.wrtReparentTo, self.geom),
+            base.camera.posHprInterval(1.5, Point3(105, -326, 5), Point3(136.3, 0, 0), blendType='easeInOut'),
+            Func(rToon.setChatAbsolute, TTL.ResistanceToonFinally, CFSpeech),
+            Wait(4),
             Func(rToon.setChatAbsolute, TTL.ResistanceToonCraneInstructions1, CFSpeech),
             Wait(4),
             Func(rToon.setChatAbsolute, TTL.ResistanceToonCraneInstructions2, CFSpeech),
@@ -449,15 +493,15 @@ class DistributedCashbotBoss(DistributedBossCog.DistributedBossCog, FSM.FSM):
             Func(rToon.setChatAbsolute, TTL.ResistanceToonCraneInstructions4, CFSpeech),
             Wait(4),
             Func(rToon.clearChat),
-            Func(camera.setPosHpr, 102, -323.6, 0.9, -10.6, 14, 0),
+            base.camera.posHprInterval(1, Point3(102, -323.6, 0.9), VBase3(-10.6, 14, 0), blendType='easeInOut'),
             Func(goon.request, 'Recovery'),
             Wait(2),
-            Func(camera.setPosHpr, 95.4, -332.6, 4.2, 167.1, -13.2, 0),
+            base.camera.posHprInterval(1, Point3(95.4, -332.6, 4.2), VBase3(167.1, -13.2, 0), blendType='easeInOut'),
             Func(rToon.setChatAbsolute, TTL.ResistanceToonGetaway, CFSpeech),
             Func(rToon.animFSM.request, 'jump'),
             Wait(1.8),
             Func(rToon.clearChat),
-            Func(camera.setPosHpr, 109.1, -300.7, 13.9, -15.6, -13.6, 0),
+            base.camera.posHprInterval(1, Point3(109.1, -300.7, 13.9), VBase3(-15.6, -13.6, 0), blendType='easeInOut'),
             Func(rToon.animFSM.request, 'run'),
             Func(goon.request, 'Walk'),
             Parallel(
@@ -468,8 +512,21 @@ class DistributedCashbotBoss(DistributedBossCog.DistributedBossCog, FSM.FSM):
             Func(crane.request, 'Free'),
             Func(self.getGeomNode().setH, 0),
             self.moveToonsToBattleThreePos(self.involvedToons),
-            Func(self.__showToons))
-        return Sequence(Func(camera.reparentTo, self), Func(camera.setPosHpr, 0, -27, 25, 0, -18, 0), track)
+            Func(self.__showToons),
+            Wait(2))
+        return Sequence(Func(base.camera.reparentTo, self), base.camera.posHprInterval(1, Point3(0, -27, 25), VBase3(0, -18, 0), blendType='easeInOut'), track) #Func(base.camera.setPosHpr, 0, -27, 25, 0, -18, 0)
+
+    def moveToonsToBattleThreePos(self, toons):
+        track = Parallel()
+        for i in xrange(len(toons)):
+            toon = base.cr.doId2do.get(toons[i])
+            if toon:
+                posHpr = ToontownGlobals.CashbotToonsBattleThreeStartPosHpr[i]
+                pos = Point3(*posHpr[0:3])
+                hpr = VBase3(*posHpr[3:6])
+                track.append(toon.posHprInterval(0.2, pos, hpr))
+
+        return track
 
     def moveToonsToBattleThreePos(self, toons):
         track = Parallel()
@@ -676,6 +733,7 @@ class DistributedCashbotBoss(DistributedBossCog.DistributedBossCog, FSM.FSM):
         self.resistanceToon.removeActive()
         self.endVault.stash()
         self.midVault.unstash()
+        self.door2.stash()
         self.__showResistanceToon(True)
 
     def exitElevator(self):
@@ -688,6 +746,7 @@ class DistributedCashbotBoss(DistributedBossCog.DistributedBossCog, FSM.FSM):
         self.endVault.unstash()
         self.evWalls.stash()
         self.midVault.unstash()
+        self.door2.stash()
         self.__showResistanceToon(True)
         base.playMusic(self.stingMusic, looping=1, volume=0.9)
         DistributedBossCog.DistributedBossCog.enterIntroduction(self)
@@ -703,12 +762,86 @@ class DistributedCashbotBoss(DistributedBossCog.DistributedBossCog, FSM.FSM):
         self.show()
         self.pelvis.setHpr(self.pelvisReversedHpr)
         self.doAnimate()
-        self.endVault.stash()
+        self.endVault.unstash()
         self.midVault.unstash()
-        self.__hideResistanceToon()
+        self.door2.stash()
+        self.__showResistanceToon(True)
 
     def exitBattleOne(self):
         DistributedBossCog.DistributedBossCog.exitBattleOne(self)
+        
+    def enterRollToBattleTwo(self):
+        self.disableToonCollision()
+        self.releaseToons()
+        self.reparentTo(render)
+        self.endVault.unstash()
+        self.midVault.unstash()
+        self.door2.stash()
+        self.stickBossToFloor()
+        intervalName = 'RollToBattleTwo'
+        seq = Sequence(self.__makeRollToBattleTwoMovie(), Func(self.__onToPrepareBattleTwo), name=intervalName)
+        seq.start()
+        self.storeInterval(seq, intervalName)
+        base.playMusic(self.betweenBattleMusic, looping=1, volume=0.9)
+        self.__showResistanceToon(True)
+
+    def __onToPrepareBattleTwo(self):
+        self.disableToonCollision()
+        self.unstickBoss()
+        self.setPosHpr(*ToontownGlobals.CashbotBossBattleTwoPosHpr)
+        self.doneBarrier('RollToBattleTwo')
+
+    def exitRollToBattleTwo(self):
+        self.unstickBoss()
+        intervalName = 'RollToBattleTwo'
+        self.clearInterval(intervalName)
+        self.betweenBattleMusic.stop()
+
+
+
+    def enterPrepareBattleTwo(self):
+        self.controlToons()
+        intervalName = 'PrepareBattleTwoMovie'
+        delayDeletes = []
+        seq = Sequence(self.makePrepareBattleTwoMovie(delayDeletes), Func(self.__beginBattleTwo), name=intervalName)
+        seq.delayDeletes = delayDeletes
+        seq.start()
+        self.__showToons()
+        self.storeInterval(seq, intervalName)
+        self.endVault.unstash()
+        self.evWalls.stash()
+        self.midVault.unstash()
+        self.door2.stash()
+        taskMgr.add(self.__doPhysics, self.uniqueName('physics'), priority=25)
+		
+    def exitPrepareBattleTwo(self):
+        intervalName = 'PrepareBattleTwoMovie'
+        self.clearInterval(intervalName)
+        self.unstickToons()
+        self.releaseToons()
+        ElevatorUtils.closeDoors(self.leftDoor, self.rightDoor, ElevatorConstants.ELEVATOR_CFO)
+
+    def enterBattleTwo(self):
+        self.cleanupIntervals()
+        self.reparentTo(render)
+        self.setPosHpr(*ToontownGlobals.CashbotBossBattleTwoPosHpr)
+        self.show()
+        self.toonsToBattlePosition(self.toonsA, self.battleANode)
+        self.toonsToBattlePosition(self.toonsB, self.battleBNode)
+        base.playMusic(self.battleTwoMusic, looping=1, volume=0.9)
+        return
+
+    def exitBattleTwo(self):
+        intervalName = self.uniqueName('cageDrop')
+        self.clearInterval(intervalName)
+        self.cleanupBattles()
+        self.battleTwoMusic.stop()
+        localAvatar.inventory.setBattleCreditMultiplier(1)
+        
+    def __beginBattleTwo(self):
+        intervalName = 'PrepareBattleTwoMovie'
+        self.clearInterval(intervalName)
+        self.doneBarrier('PrepareBattleTwo')
 
     def enterPrepareBattleThree(self):
         self.controlToons()
@@ -723,8 +856,9 @@ class DistributedCashbotBoss(DistributedBossCog.DistributedBossCog, FSM.FSM):
         seq.start()
         self.storeInterval(seq, intervalName)
         self.endVault.unstash()
-        self.evWalls.stash()
+        self.evWalls.unstash()
         self.midVault.unstash()
+        self.door2.stash()
         self.__showResistanceToon(False)
         taskMgr.add(self.__doPhysics, self.uniqueName('physics'), priority=25)
 
@@ -929,7 +1063,7 @@ class DistributedCashbotBoss(DistributedBossCog.DistributedBossCog, FSM.FSM):
         if self.hasLocalToon():
             self.toWalkMode()
         self.door3.setZ(25)
-        self.door2.setZ(25)
+        self.door2.stash()
         self.endVault.unstash()
         self.evWalls.stash()
         self.midVault.unstash()

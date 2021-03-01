@@ -48,8 +48,8 @@ class DistributedSuitBaseAI(DistributedAvatarAI.DistributedAvatarAI, SuitBase.Su
         if hasattr(self, 'doId'):
             self.d_setLevelDist(self.level)
         hp = attributes['hp'][self.level]
-        self.maxHP = hp
         self.currHP = hp
+        self.maxHP = hp
 
     def getLevelDist(self):
         return self.getLevel()
@@ -57,9 +57,12 @@ class DistributedSuitBaseAI(DistributedAvatarAI.DistributedAvatarAI, SuitBase.Su
     def d_setLevelDist(self, level):
         self.sendUpdate('setLevelDist', [level])
 
-    def setupSuitDNA(self, level, type, track):
+    def setupSuitDNA(self, level, type, track, extraSuit=None):
         dna = SuitDNA.SuitDNA()
-        dna.newSuitRandom(type, track)
+        if not extraSuit:
+            dna.newSuitRandom(type, track)
+        else:
+            dna.newSuit(extraSuit)
         self.dna = dna
         self.track = track
         self.setLevel(level)

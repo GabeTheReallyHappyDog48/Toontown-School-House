@@ -7,7 +7,7 @@ from direct.directnotify import DirectNotifyGlobal
 from toontown.battle import SuitBattleGlobals
 import SuitTimings
 import SuitDNA
-from toontown.toonbase import TTLocalizer
+from toontown.toonbase import TTLocalizer, ToontownGlobals
 TIME_BUFFER_PER_WPT = 0.25
 TIME_DIVISOR = 100
 DISTRIBUTE_TASK_CREATION = 0
@@ -45,9 +45,18 @@ class SuitBase:
 
     def setLevel(self, level):
         self.level = level
-        nameWLevel = TTLocalizer.SuitBaseNameWithLevel % {'name': self.name,
-         'dept': self.getStyleDept(),
-         'level': self.getActualLevel()}
+        if self.dna.name == 'ooo':
+            nameWLevel = TTLocalizer.SuitBaseNameWithLevel % {'name': self._name,
+             'dept': self.getStyleDept(),
+             'level': self.getActualLevel()}
+        elif self.dna.name == 'ye':
+            nameWLevel = TTLocalizer.SuitBaseNameWithLevel % {'name': self._name,
+             'dept': self.getStyleDept(),
+             'level': self.getActualLevel()}
+        else:
+            nameWLevel = TTLocalizer.SuitBaseNameWithLevel % {'name': self._name,
+             'dept': self.getStyleDept(),
+             'level': self.getActualLevel()}
         self.setDisplayName(nameWLevel)
         attributes = SuitBattleGlobals.SuitAttributes[self.dna.name]
         self.maxHP = attributes['hp'][self.level]
@@ -61,7 +70,10 @@ class SuitBase:
 
     def getActualLevel(self):
         if hasattr(self, 'dna'):
-            return SuitBattleGlobals.getActualFromRelativeLevel(self.getStyleName(), self.level) + 1
+            lv = SuitBattleGlobals.getActualFromRelativeLevel(self.getStyleName(), self.level)
+            if lv == 49:
+                lv = 15  # HACK
+            return ToontownGlobals.SuitLevels[lv]
         else:
             self.notify.warning('called getActualLevel with no DNA, returning 1 for level')
             return 1
